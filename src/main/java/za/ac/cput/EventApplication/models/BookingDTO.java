@@ -2,35 +2,34 @@ package za.ac.cput.EventApplication.models;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 public class BookingDTO {
 
-        @Min(0)
-        private int id;
+    private long bookingId; // Match entity
 
-        @Min(0)
-        private long customerID;
+    @Min(1)
+    private long customerID;
 
-        @Min(0)
-        private long ticketID;
+    @Min(1)
+    private long ticketID;
 
-        @NotNull (message = "Status cannot be null")
-        private String status;
+    @NotNull(message = "Status cannot be null")
+    private String status;
 
-        @NotNull(message = "Booking Date must not be null")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        private LocalDateTime bookingDate;
+    @NotNull(message = "BookingService Date must not be null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime bookingDate;
 
-    public int getId() {
-        return id;
+    // Getters & Setters
+    public long getBookingId() {
+        return bookingId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setBookingId(long bookingId) {
+        this.bookingId = bookingId;
     }
 
     public long getCustomerID() {

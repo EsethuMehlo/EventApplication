@@ -1,22 +1,24 @@
 package za.ac.cput.EventApplication.services;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import za.ac.cput.EventApplication.models.Booking;
-import org.springframework.beans.factory.annotation.Autowired;
 import za.ac.cput.EventApplication.repository.BookingRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class BookingServices implements iService <Booking, Long>{
+public class BookingServices implements iService<Booking, Long> {
 
     private final BookingRepo bookingRepository;
 
     @Autowired
-    BookingServices(BookingRepo bookingRepository) {
+    public BookingServices(BookingRepo bookingRepository) {
         this.bookingRepository = bookingRepository;
-    }
-
-    public BookingServices() {
     }
 
     @Override
@@ -25,30 +27,41 @@ public class BookingServices implements iService <Booking, Long>{
     }
 
     @Override
-    public Booking read(Booking booking) {
-        Long id = booking.getBookingId();
+    public Booking read(Long id) {
         return bookingRepository.findById(id).orElse(null);
     }
 
     @Override
     public Booking update(Booking booking) {
-        return bookingRepository.save(booking);
+        if (bookingRepository.existsById(booking.getBookingId())) {
+            return bookingRepository.save(booking);
+        }
+        return null;
     }
 
     @Override
     public void delete(Long id) {
         if (bookingRepository.existsById(id)) {
             bookingRepository.deleteById(id);
-            System.out.println("Booking has been deleted");
         }
-        else {
-            System.out.println("Booking not found");
-        }
-        bookingRepository.deleteById(id);
     }
 
     @Override
-    public List<Booking> getAll(Booking booking) {
+    public List<Booking> getAll() {
         return bookingRepository.findAll();
     }
+
+    public List<Booking> getBookingsByCustomerID(long customerID) {
+        return bookingRepository.findAllByCustomerID(customerID);
+    }
+
+    public List<Booking> getBookingsByCustomerIDAndDate(long customerID, LocalDateTime bookingDate) {
+        return bookingRepository.findAllByCustomerIDAndBookingDate(customerID, bookingDate);
+    }
+
+    public List<Booking> getBookingsByStatus(String status) {
+        return bookingRepository.findAllByStatus(status);
+    }
+
+
 }

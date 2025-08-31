@@ -14,68 +14,59 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class BookingController extends BookingServices {
+@RequestMapping("/api/bookings") // recommended for RESTful routes
+public class BookingController {
+
+    private final BookingServices bookingServices;
 
     @Autowired
-    private BookingRepo bookingRepo;
-    private BookingServices bookingServices;
-
-    public ResponseEntity<List<Booking>> getAllBookings(){
-        try {
-
-            List<Booking> bookingList = new ArrayList<>();
-            bookingRepo.findAll().forEach(bookingList::add);
-
-            if (bookingList.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        }
-        catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @GetMapping("/getBookingById")
-    public ResponseEntity<Booking> getAllBookingByCustomerName(@PathVariable Long
-                                                               bookingId) {
-
-        Optional<Booking> bookingData = bookingRepo.findById(bookingId);
-
-        if (bookingData.isPresent()) {
-            return new ResponseEntity<>(bookingData.get(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+    public BookingController(BookingServices bookingServices) {
+        this.bookingServices = bookingServices;
     }
 
+    @GetMapping
+    public ResponseEntity<List<Booking>> getAllBookings() {
+        List<Booking> bookings = bookingServices.getAll();
+        if (bookings.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(bookings, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
+        Booking booking = bookingServices.read(id);
+        if (booking == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(booking, HttpStatus.OK);
+    }
+
+    @PostMapping
     public ResponseEntity<Booking> addBooking(@RequestBody Booking booking) {
-
-        return new ResponseEntity<>(bookingServices.create(booking), HttpStatus.OK);
-
-
+        Booking saved = bookingServices.create(booking);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    @PostMapping("/updateBookById/{id}")
-    public ResponseEntity<Booking> updateBookingByID(@PathVariable Long id, @RequestBody Booking bookingdata) {
-        Optional<Booking> bookingData = bookingRepo.findById(id);
-        if (bookingData.isPresent()) {
-            Booking updatedBookingData = bookingData.get();
-            updatedBookingData.setBookingDate(bookingdata.getBookingDate());
-            updatedBookingData.setTicketID(bookingdata.getTicketID());
-            updatedBookingData.setCustomerID(bookingdata.getCustomerID());
-            Booking bookingObj = bookingRepo.save(updatedBookingData);
-            return new ResponseEntity<>(HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @RequestBody Booking bookingData) {
+        Booking existing = bookingServices.read(id);
+        if (existing == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        existing.setBookingDate(bookingData.getBookingDate());
+        existing.setTicketID(bookingData.getTicketID());
+        existing.setCustomerID(bookingData.getCustomerID());
+        existing.setStatus(bookingData.getStatus());
+
+        return new ResponseEntity<>(bookingServices.update(existing), HttpStatus.OK);
     }
 
-    @DeleteMapping("deleteBookingById/{id}")
-    public ResponseEntity<HttpStatus> deleteBookingById(@PathVariable Long id) {
-        bookingRepo.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteBooking(@PathVariable Long id) {
+        bookingServices.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
+

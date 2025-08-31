@@ -1,21 +1,16 @@
 package za.ac.cput.EventApplication.services;
 
-import org.springframework.stereotype.Service;
-import za.ac.cput.EventApplication.models.Booking;
-
 import java.util.List;
 
-@Service
-public interface iService <Booking, Long>{
+public interface iService<T, ID> {
 
+    T create(T t);
 
-    Booking create(Booking booking);
+    T read(ID id);
 
-    Booking read(Booking booking);
+    T update(T t);
 
-    Booking update(Booking booking);
+    void delete(ID id);
 
-    void delete(Long id);
-
-    List<Booking> getAll(Booking booking);
+    List<T> getAll();
 }

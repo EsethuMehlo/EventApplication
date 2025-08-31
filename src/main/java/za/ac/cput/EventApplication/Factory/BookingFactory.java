@@ -11,9 +11,7 @@ public class BookingFactory {
                                              String status){
             if (Helper.isZeroOrNullLong(customerID)
                     || Helper.isZeroOrNullLong(ticketID) || Helper.isNullorEmpty(status))
-
-                return null;
-
+                    throw new IllegalArgumentException("Invalid input for creating a booking");
             return new Booking.Builder().setCustomerID(customerID).setTicketID(ticketID)
                     .setBookingDate(bookingDate).setStatus(status).build();
 
