@@ -1,0 +1,5 @@
+<form (ngSubmit)="submit()">
+  <input [(ngModel)]="booking.customerName" name="customerName" placeholder="Customer Name" required>
+  <input [(ngModel)]="booking.ticketType" name="ticketType" placeholder="Ticket Type" required>
+  <button type="submit">Add Booking</button>
+</form>
